@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#6b7b3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="الريحانة">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<title>الريحانة للشمع</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --card:#ffffff; --ink:#2c3320; --muted:#7d8570; --line:#e3e8d6;
+  --accent:#6b7b3a; --accent-soft:#eef2e2; --good:#4f7a2e; --bad:#b5452f; --warn:#a07a1a; --glass:rgba(255,255,255,.35);
+  --stage:#1f2414; --olive-2:#8a9a50;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,sans-serif;font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding:0 14px 120px}
+
+/* splash */
+.splash{position:fixed;inset:0;z-index:50;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .7s ease,visibility .7s}
+.splash.done{opacity:0;visibility:hidden}
+.splash svg{width:150px;height:150px;overflow:visible}
+.sp-draw{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:300;stroke-dashoffset:300;animation:draw 1.1s ease forwards}
+.sp-fillwax{fill:var(--accent-soft);opacity:0;animation:fadeIn .5s .9s forwards}
+.sp-wick{stroke:var(--ink);stroke-width:2;stroke-dasharray:20;stroke-dashoffset:20;animation:draw .3s 1s forwards}
+.sp-flame{transform-origin:60px 40px;transform:scale(0);animation:ignite .6s 1.25s cubic-bezier(.3,1.6,.5,1) forwards}
+.sp-flame path{animation:flickSp 1.4s 1.9s ease-in-out infinite;transform-origin:60px 40px}
+.sp-glow{opacity:0;animation:fadeIn .8s 1.4s forwards}
+.sp-leaf{fill:var(--olive-2);transform:scale(0);animation:leaf .6s cubic-bezier(.3,1.5,.5,1) forwards}
+.sp-leaf.l1{transform-origin:40px 108px;animation-delay:1.5s}
+.sp-leaf.l2{transform-origin:80px 108px;animation-delay:1.65s}
+.sp-leaf.l3{transform-origin:34px 96px;animation-delay:1.8s;fill:var(--accent)}
+.sp-vein{stroke:#fff;stroke-width:1;fill:none;opacity:0;animation:fadeIn .4s 2s forwards}
+.sp-name{font-size:30px;font-weight:800;color:var(--accent);display:flex;gap:1px}
+.sp-name span{opacity:0;transform:translateY(12px);animation:rise .5s cubic-bezier(.3,1.4,.5,1) forwards}
+.sp-sub{color:var(--muted);font-size:14px;opacity:0;animation:fadeIn .6s 2.6s forwards;letter-spacing:.5px}
+.sp-line{width:0;height:2px;background:var(--accent);border-radius:2px;animation:line .6s 2.4s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes ignite{to{transform:scale(1)}}
+@keyframes leaf{to{transform:scale(1)}}
+@keyframes rise{to{opacity:1;transform:none}}
+@keyframes line{to{width:120px}}
+@keyframes flickSp{0%,100%{transform:rotate(-3deg) scaleY(1)}50%{transform:rotate(3deg) scaleY(1.07)}}
+.logo-mini .lm-leaf{transform-origin:center;animation:sway 3s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+
+/* header + tabs */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+h1{font-size:21px;margin:0;font-weight:800;color:var(--accent)}
+header p{margin:0;color:var(--muted);font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;position:relative}
+.tabs button{font:inherit;font-weight:700;font-size:14px;background:none;border:none;color:var(--muted);padding:9px 4px;border-radius:10px;cursor:pointer;position:relative;z-index:1;transition:color .3s}
+.tabs button.on{color:#fff}
+.tabs .pill{position:absolute;top:4px;bottom:4px;width:calc((100% - 8px)/3);right:4px;background:var(--accent);border-radius:10px;transition:transform .45s cubic-bezier(.6,.05,.25,1.2)}
+.page{display:none;animation:pageIn .5s ease both}
+.page.on{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(80,95,40,.05)}
+.card h2{font-size:16px;margin:0 0 10px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card h2 small{color:var(--muted);font-weight:400;font-size:12px}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-height:42px}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+input[type=color]{padding:3px;min-height:42px;cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.mt{margin-top:10px}
+.btn{font:inherit;font-weight:700;border:none;border-radius:12px;padding:10px 14px;cursor:pointer;min-height:42px;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn-main{background:var(--accent);color:#fff}
+.btn-ghost{background:var(--accent-soft);color:var(--accent)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.x{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 6px;line-height:1}
+.x:hover{color:var(--bad)}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.warn{font-size:12.5px;color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent);border-radius:8px;padding:6px 8px;margin-top:8px;animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+/* ===== candle stage ===== */
+.stage{background:radial-gradient(ellipse at 50% 30%,#4a5530 0%,var(--stage) 70%);border-radius:18px;height:300px;position:relative;overflow:hidden;margin-bottom:12px;border:1px solid var(--line)}
+.stage .glow{position:absolute;left:50%;top:22%;width:260px;height:260px;margin-left:-130px;margin-top:-130px;border-radius:50%;background:radial-gradient(circle,rgba(255,190,90,.45),rgba(255,150,50,.12) 40%,transparent 70%);animation:glow 3s ease-in-out infinite;transition:opacity .8s}
+@keyframes glow{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.08);opacity:1}}
+.table{position:absolute;bottom:0;left:0;right:0;height:42px;background:linear-gradient(#3b4424,#232a14);}
+.jar{position:absolute;bottom:30px;left:50%;width:120px;height:170px;margin-left:-60px;border-radius:10px 10px 16px 16px;border:2px solid rgba(255,255,255,.35);border-top-width:3px;background:var(--glass);backdrop-filter:blur(1px);transition:all .6s cubic-bezier(.5,0,.2,1)}
+.jar::after{content:"";position:absolute;top:8px;bottom:12px;right:10px;width:9px;border-radius:6px;background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,.08));pointer-events:none;transition:opacity .4s}
+.layers{position:absolute;left:5px;right:5px;bottom:5px;height:86%;display:flex;flex-direction:column-reverse;border-radius:4px 4px 11px 11px;overflow:hidden;transition:all .6s}
+.layer{flex:none;transition:height .7s cubic-bezier(.5,0,.2,1),background-color .5s;position:relative;animation:pourIn .8s cubic-bezier(.5,0,.2,1) both}
+.layer::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.12),transparent 30%,transparent 70%,rgba(0,0,0,.15))}
+.layer.gel{opacity:.6}
+.layer.gel::after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);left:30%;bottom:20%;box-shadow:24px -12px 0 -1px rgba(255,255,255,.6),50px 5px 0 -1px rgba(255,255,255,.5)}
+@keyframes pourIn{from{height:0!important;opacity:.3}}
+.layers.slant .layer{transform:skewY(-9deg);margin:-4px 0}
+.layers.slant{overflow:hidden}
+.jar.pillar{border-color:transparent;background:transparent;backdrop-filter:none;height:150px;bottom:34px}
+.jar.pillar::after{opacity:0}
+.jar.pillar .layers{height:100%;left:0;right:0;bottom:0;border-radius:6px 6px 4px 4px}
+.wick{position:absolute;left:50%;width:3px;height:16px;margin-left:-1.5px;background:#2a2320;border-radius:2px;bottom:calc(86% + 3px);transition:bottom .6s}
+.jar.pillar .wick{bottom:100%}
+.flame{position:absolute;left:50%;bottom:calc(100% + 10px);width:18px;height:42px;margin-left:-9px;transform-origin:50% 100%;animation:flick 1.6s ease-in-out infinite;transition:opacity .5s,transform .5s}
+.flame .o{position:absolute;inset:0;border-radius:50% 50% 45% 45%/65% 65% 35% 35%;background:radial-gradient(ellipse at 50% 80%,#fff8d6 0%,#ffd36b 35%,#ff9a2e 70%,rgba(255,100,20,0) 100%);filter:blur(.6px)}
+.flame .i{position:absolute;left:5px;right:5px;bottom:2px;height:14px;border-radius:50%;background:radial-gradient(ellipse at 50% 70%,#6fa8ff,rgba(80,130,255,0) 75%);opacity:.75}
+@keyframes flick{0%,100%{transform:rotate(-2deg) scaleY(1)}20%{transform:rotate(2deg) scaleY(1.06) scaleX(.95)}45%{transform:rotate(-1deg) scaleY(.96)}70%{transform:rotate(3deg) scaleY(1.04) scaleX(.97)}}
+.off .flame{opacity:0;transform:scale(.2)}
+.off .glow{opacity:0}
+.smoke{position:absolute;left:50%;bottom:calc(100% + 14px);width:8px;height:8px;margin-left:-4px;border-radius:50%;background:rgba(220,220,220,.5);opacity:0;pointer-events:none}
+.off .smoke{animation:smoke 2.2s ease-out}
+.off .smoke.s2{animation-delay:.25s}.off .smoke.s3{animation-delay:.5s}
+@keyframes smoke{0%{opacity:.7;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(14px,-90px) scale(4)}}
+.jar-label{position:absolute;left:50%;transform:translateX(-50%);bottom:34%;background:rgba(255,250,240,.92);color:#3a2b20;font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.jar-label:empty{display:none}
+.stage-ctrl{position:absolute;top:10px;right:10px;left:10px;display:flex;justify-content:space-between;gap:6px}
+.chip{font:inherit;font-size:12px;font-weight:700;background:rgba(255,255,255,.12);color:#f8eadb;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 11px;cursor:pointer;backdrop-filter:blur(4px)}
+.chip.on{background:var(--accent);border-color:transparent;color:#fff}
+.stage-info{position:absolute;bottom:8px;right:12px;color:#f3e4d2;font-size:12px;opacity:.8}
+
+/* layers editor */
+.lay{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;animation:pageIn .4s both}
+.lay-top{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.lay-num{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:13px;color:#3a2b20;flex:none;border:1px solid rgba(0,0,0,.1)}
+.lay-cost{margin-inline-start:auto;font-weight:700;color:var(--accent);font-size:14px}
+.frag{display:grid;grid-template-columns:auto 1.4fr 1fr .8fr auto;gap:6px;align-items:end;margin-bottom:10px;animation:pageIn .4s both}
+.frag .ic{width:30px;height:42px;display:grid;place-items:center}
+.frag .ic svg{width:22px;height:30px}
+.frag .stat{grid-column:2/-1;font-size:12px;color:var(--muted);margin-top:-4px}
+.frag .stat b{color:var(--accent)}
+.mat{display:grid;grid-template-columns:1.3fr 1fr 1fr .8fr auto;gap:6px;align-items:end;margin-bottom:8px}
+.mat input{padding:8px 7px}
+.mat .c{font-size:12.5px;color:var(--accent);font-weight:700;padding-bottom:10px;white-space:nowrap}
+@media (max-width:460px){ .grid3{grid-template-columns:1fr 1fr} .mat{grid-template-columns:1fr 1fr 1fr} .mat .nm{grid-column:1/-1} }
+
+/* results */
+.res-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.res-row:last-child{border-bottom:none}
+.res-row b{font-variant-numeric:tabular-nums}
+.big{font-size:25px;font-weight:800;color:var(--accent)}
+.price-box{background:var(--accent-soft);border-radius:14px;padding:12px;text-align:center;margin-top:8px}
+.price-box .lbl{font-size:13px;color:var(--muted)}
+.good{color:var(--good)} .bad{color:var(--bad)}
+.breakdown{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:4px 0 8px;background:var(--line)}
+.breakdown div{transition:width .7s cubic-bezier(.5,0,.2,1)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-inline-end:4px;vertical-align:middle}
+.bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(0,0,0,.06);transition:transform .4s;z-index:4}
+.bar.hide{transform:translateY(110%)}
+.bar-in{max-width:720px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar .k{font-size:12px;color:var(--muted)}
+.bar .v{font-size:19px;font-weight:800}
+.saved{display:flex;flex-direction:column;gap:6px}
+.saved-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.saved-item span{flex:1;font-weight:500;cursor:pointer}
+.saved-item em{font-style:normal;color:var(--muted);font-size:13px}
+.toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-20px);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ===== guide ===== */
+.wax-pick{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.wax-pick button{flex:none;font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.25s}
+.wax-pick button i{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.wax-pick button.on{background:var(--accent);color:#fff;border-color:transparent}
+.temps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.temp{background:var(--accent-soft);border-radius:10px;padding:8px 4px;text-align:center}
+.temp b{display:block;font-size:16px;color:var(--accent)}
+.temp span{font-size:11px;color:var(--muted)}
+.step{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center}
+.step h3{margin:0 0 4px;font-size:16px}
+.step h3 em{font-style:normal;color:var(--accent);margin-inline-end:6px}
+.step p{margin:0;font-size:14.5px}
+.step .tip{font-size:13px;color:var(--muted);margin-top:6px}
+.ill{width:96px;height:96px;border-radius:16px;background:var(--accent-soft);position:relative;overflow:hidden}
+.ill *{position:absolute}
+/* 1 scale */
+.sc-base{bottom:16px;left:16px;right:16px;height:12px;border-radius:4px;background:#8a7d72}
+.sc-plate{bottom:28px;left:22px;right:22px;height:5px;border-radius:3px;background:#b9aca0;animation:scale 2.4s ease-in-out infinite}
+.sc-flakes{bottom:33px;left:30px;right:30px;height:16px;border-radius:50% 50% 4px 4px;background:#f3e7cf;animation:scale 2.4s ease-in-out infinite}
+@keyframes scale{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+/* 2 melt */
+.pot{bottom:14px;left:18px;right:18px;height:40px;border-radius:4px 4px 12px 12px;background:#9aa3ad}
+.pot-in{bottom:20px;left:26px;right:26px;height:24px;border-radius:3px 3px 8px 8px;background:#f6dfae;overflow:hidden}
+.bub{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.8);bottom:-6px;animation:bub 1.8s ease-in infinite}
+@keyframes bub{to{transform:translateY(-30px);opacity:0}}
+.fire{bottom:4px;width:8px;height:12px;border-radius:50% 50% 40% 40%;background:linear-gradient(#ffd36b,#ff7a1a);animation:flick .6s infinite}
+.thermo{top:8px;right:10px;width:8px;height:44px;border-radius:4px;background:#fff;border:1px solid #ccc;overflow:hidden}
+.thermo::after{content:"";position:absolute;bottom:0;left:0;right:0;background:#e2533c;animation:heat 3s ease-in-out infinite}
+@keyframes heat{0%{height:15%}70%,100%{height:85%}}
+/* 3 fragrance */
+.bottle{top:10px;left:22px;width:20px;height:30px;border-radius:4px;background:#7b4fb5;transform:rotate(-35deg);transform-origin:bottom}
+.bottle::before{content:"";position:absolute;top:-8px;left:6px;width:8px;height:9px;background:#5c3a8a;border-radius:2px}
+.drop{left:44px;top:34px;width:6px;height:9px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#a57ce0;animation:drop 1.4s ease-in infinite}
+@keyframes drop{0%{transform:translateY(0);opacity:1}80%{opacity:1}100%{transform:translateY(26px);opacity:0}}
+.bowl{bottom:12px;left:16px;right:16px;height:28px;border-radius:4px 4px 16px 16px;background:linear-gradient(90deg,#f6dfae,#e8b7d4,#f6dfae);background-size:200% 100%;animation:swirl 2.5s linear infinite}
+@keyframes swirl{to{background-position:200% 0}}
+.spoon{bottom:24px;left:44px;width:4px;height:44px;background:#b98a5e;border-radius:2px;transform-origin:bottom;animation:stir 1.2s ease-in-out infinite}
+@keyframes stir{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+/* 4 wick */
+.wjar{bottom:12px;left:26px;right:26px;height:52px;border:2px solid #9aa3ad;border-top:none;border-radius:0 0 10px 10px}
+.wk{left:46px;width:3px;height:40px;background:#3a2b20;bottom:14px;animation:wickin 2.4s ease-in-out infinite}
+.wk::after{content:"";position:absolute;bottom:-2px;left:-5px;width:13px;height:4px;background:#888;border-radius:2px}
+.clip{top:22px;left:30px;width:36px;height:5px;background:#6b7b3a;border-radius:3px}
+@keyframes wickin{0%{transform:translateY(-30px);opacity:0}40%,100%{transform:none;opacity:1}}
+/* 5 pour */
+.pitcher{top:6px;left:12px;width:34px;height:26px;background:#9aa3ad;border-radius:4px 4px 8px 8px;transform:rotate(30deg);transform-origin:right bottom}
+.stream{top:30px;left:47px;width:5px;height:34px;background:#f3d9a7;border-radius:3px;animation:stream 3s ease-in-out infinite;transform-origin:top}
+@keyframes stream{0%,10%{transform:scaleY(0)}25%,80%{transform:scaleY(1)}95%,100%{transform:scaleY(0)}}
+.pjar{bottom:10px;left:30px;right:22px;height:34px;border:2px solid #9aa3ad;border-top:none;border-radius:0 0 8px 8px;overflow:hidden}
+.pfill{bottom:0;left:0;right:0;background:#f3d9a7;animation:pfill 3s ease-in-out infinite}
+@keyframes pfill{0%,15%{height:0}85%,100%{height:80%}}
+/* 6 layers */
+.ljar{bottom:10px;left:28px;right:28px;height:64px;border:2px solid #9aa3ad;border-top:none;border-radius:0 0 10px 10px;overflow:hidden;display:flex;flex-direction:column-reverse}
+.ljar div{position:relative;height:0;animation:lfill 4.5s ease-in-out infinite}
+.ljar div:nth-child(1){background:#e8a3b5}
+.ljar div:nth-child(2){background:#fff4e0;animation-name:lfill2}
+.ljar div:nth-child(3){background:#b49be0;animation-name:lfill3}
+@keyframes lfill{0%{height:0}15%,100%{height:30%}}
+@keyframes lfill2{0%,33%{height:0}48%,100%{height:30%}}
+@keyframes lfill3{0%,66%{height:0}81%,100%{height:30%}}
+/* 7 cool */
+.cjar{bottom:10px;left:28px;right:28px;height:56px;border:2px solid #9aa3ad;border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.cfill{bottom:0;left:0;right:0;height:85%;animation:cool 4s ease-in-out infinite}
+@keyframes cool{0%{background:#f6dfae;filter:brightness(1.15)}100%{background:#f8f1e4;filter:none}}
+.snow{top:10px;width:16px;height:16px;color:#5b8fb9;font-size:16px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(6px);opacity:1}}
+/* 8 cure */
+.cal{top:14px;left:18px;right:18px;bottom:14px;background:#fff;border-radius:8px;border:2px solid #6b7b3a;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:16px 6px 6px}
+.cal::before{content:"";position:absolute;top:0;left:0;right:0;height:10px;background:#6b7b3a}
+.cal i{position:static;background:#ece3d8;border-radius:2px;animation:day 4s infinite}
+.cal i:nth-child(2){animation-delay:.3s}.cal i:nth-child(3){animation-delay:.6s}.cal i:nth-child(4){animation-delay:.9s}.cal i:nth-child(5){animation-delay:1.2s}.cal i:nth-child(6){animation-delay:1.5s}.cal i:nth-child(7){animation-delay:1.8s}.cal i:nth-child(8){animation-delay:2.1s}
+@keyframes day{0%,10%{background:#ece3d8}20%,90%{background:#7fa86b}}
+/* 9 burn */
+.bjar{bottom:10px;left:28px;right:28px;height:46px;border:2px solid #9aa3ad;border-top:none;border-radius:0 0 10px 10px;background:#f3e7cf}
+.pool{bottom:41px;left:30px;right:30px;height:6px;border-radius:50%;background:#e9c98d;animation:pool 4s ease-out infinite;transform-origin:center}
+@keyframes pool{0%{transform:scaleX(.15)}80%,100%{transform:scaleX(1)}}
+.bfl{bottom:52px;left:43px;width:10px;height:22px;border-radius:50% 50% 45% 45%/65% 65% 35% 35%;background:radial-gradient(ellipse at 50% 80%,#fff8d6,#ffb347 60%,transparent);animation:flick 1.3s infinite}
+
+.safety{background:color-mix(in srgb,var(--bad) 8%,var(--card));border-color:color-mix(in srgb,var(--bad) 30%,var(--line))}
+.safety ul{margin:0;padding-inline-start:18px;font-size:14px}
+.safety li{margin-bottom:4px}
+.techs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tech{text-align:center;font-size:13px}
+.tech .mini{height:70px;width:46px;margin:0 auto 6px;border:2px solid #9aa3ad;border-top:none;border-radius:0 0 8px 8px;overflow:hidden;display:flex;flex-direction:column-reverse;position:relative}
+.tech .mini div{flex:1}
+.tech.slant .mini div{transform:skewY(-18deg) scale(1.3)}
+.tech.ombre .mini{background:linear-gradient(#b49be0,#e8c6e8 50%,#fff4e0)}
+.tech.slant .mini{animation:tilt 3s ease-in-out infinite}
+@keyframes tilt{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+.tech b{display:block}
+.tech span{color:var(--muted);font-size:12px}
+
+/* ===== wax types ===== */
+.wax-card{position:relative;overflow:hidden}
+.wax-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.wax-blob{width:46px;height:46px;border-radius:14px;flex:none;position:relative;box-shadow:inset 0 -6px 10px rgba(0,0,0,.08);animation:blob 6s ease-in-out infinite}
+@keyframes blob{0%,100%{border-radius:14px 18px 12px 20px}50%{border-radius:20px 12px 18px 14px}}
+.wax-head h3{margin:0;font-size:17px}
+.wax-head p{margin:0;font-size:13px;color:var(--muted)}
+.props{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.prop{background:var(--bg);border-radius:10px;padding:6px 4px;text-align:center}
+.prop b{display:block;font-size:13.5px}
+.prop span{font-size:11px;color:var(--muted)}
+.meter{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:5px}
+.meter span{width:92px;color:var(--muted);flex:none}
+.meter .track{flex:1;height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+.meter .fill{height:100%;background:var(--accent);border-radius:4px;width:0;transition:width 1.2s cubic-bezier(.5,0,.2,1)}
+.reveal.in .meter .fill{width:var(--w)}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;font-size:13.5px}
+.pc ul{margin:4px 0 0;padding-inline-start:16px}
+.pc h4{margin:0;font-size:13px}
+.pc .p h4{color:var(--good)} .pc .c h4{color:var(--bad)}
+@media (max-width:460px){ .pc{grid-template-columns:1fr} .props,.temps{grid-template-columns:repeat(2,1fr)} }
+
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important} .reveal{opacity:1;transform:none} }
+</style>
+</head>
+<body>
+<div class="splash" id="splash" aria-hidden="true">
+  <svg viewBox="0 0 120 130">
+    <defs><radialGradient id="spg"><stop offset="0" stop-color="#ffd36b" stop-opacity=".55"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
+<linearGradient id="spf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff9a2e"/><stop offset=".6" stop-color="#ffd36b"/><stop offset="1" stop-color="#fff6d0"/></linearGradient></defs>
+    <circle class="sp-glow" cx="60" cy="30" r="34" fill="url(#spg)"/>
+    <rect class="sp-fillwax" x="40" y="52" width="40" height="60" rx="6"/>
+    <path class="sp-draw" d="M46 52 H74 Q80 52 80 58 V106 Q80 112 74 112 H46 Q40 112 40 106 V58 Q40 52 46 52 Z"/>
+    <path class="sp-draw" style="animation-delay:.5s" d="M40 68 H80"/>
+    <line class="sp-wick" x1="60" y1="52" x2="60" y2="42"/>
+    <g class="sp-flame"><path d="M60 14 C66 23 70 28 70 34 A10 10 0 0 1 50 34 C50 28 54 23 60 14 Z" fill="url(#spf)"/></g>
+    <path class="sp-leaf l1" d="M40 108 C26 106 18 94 20 82 C32 84 42 94 40 108 Z"/>
+    <path class="sp-leaf l2" d="M80 108 C94 106 102 94 100 82 C88 84 78 94 80 108 Z"/>
+    <path class="sp-leaf l3" d="M34 96 C24 90 22 78 26 70 C34 76 38 86 34 96 Z"/>
+    <path class="sp-vein" d="M39 106 C34 98 28 90 21 83 M81 106 C86 98 92 90 99 83"/>
+  </svg>
+  <div class="sp-name" id="spName"></div>
+  <div class="sp-line"></div>
+  <div class="sp-sub">شموع معطّرة مصنوعة باليد</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+  <div class="top">
+    <header>
+      <svg class="logo-mini" width="42" height="42" viewBox="0 0 120 130" aria-hidden="true">
+        <defs><linearGradient id="hf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff9a2e"/><stop offset=".6" stop-color="#ffd36b"/><stop offset="1" stop-color="#fff6d0"/></linearGradient></defs>
+        <path d="M46 52 H74 Q80 52 80 58 V106 Q80 112 74 112 H46 Q40 112 40 106 V58 Q40 52 46 52 Z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="5"/>
+        <line x1="60" y1="52" x2="60" y2="42" stroke="var(--ink)" stroke-width="4"/>
+        <path d="M60 14 C66 23 70 28 70 34 A10 10 0 0 1 50 34 C50 28 54 23 60 14 Z" fill="url(#hf)"><animateTransform attributeName="transform" type="rotate" values="-4 60 40;4 60 40;-4 60 40" dur="1.8s" repeatCount="indefinite"/></path>
+        <path class="lm-leaf" d="M40 108 C26 106 18 94 20 82 C32 84 42 94 40 108 Z" fill="var(--olive-2)"/>
+        <path class="lm-leaf" d="M80 108 C94 106 102 94 100 82 C88 84 78 94 80 108 Z" fill="var(--olive-2)" style="animation-delay:-1.5s"/>
+      </svg>
+      <div><h1>الريحانة للشمع</h1><p>احسب الكلفة، اعرف الأنواع، وتعلّم الصنع</p></div>
+    </header>
+    <nav class="tabs" id="tabs">
+      <div class="pill" id="pill"></div>
+      <button data-t="calc" class="on">الحاسبة</button>
+      <button data-t="guide">طريقة الصنع</button>
+      <button data-t="types">أنواع الشمع</button>
+    </nav>
+  </div>
+
+  <!-- ================= CALC ================= -->
+  <section class="page on" id="p-calc">
+    <div class="stage" id="stage">
+      <div class="glow"></div>
+      <div class="stage-ctrl">
+        <div style="display:flex;gap:6px">
+          <button class="chip on" data-shape="jar">كأس</button>
+          <button class="chip" data-shape="pillar">عمود</button>
+          <button class="chip" id="slantBtn">مائل</button>
+        </div>
+        <button class="chip" id="fireBtn">🔥 إطفاء</button>
+      </div>
+      <div class="table"></div>
+      <div class="jar" id="jar">
+        <div class="layers" id="layersVis"></div>
+        <div class="wick"><div class="flame"><div class="o"></div><div class="i"></div></div><div class="smoke"></div><div class="smoke s2"></div><div class="smoke s3"></div></div>
+        <div class="jar-label" id="jarLabel"></div>
+      </div>
+      <div class="stage-info" id="stageInfo"></div>
+    </div>
+
+    <div class="card">
+      <h2>المنتج</h2>
+      <div class="grid2">
+        <div><label>اسم الشمعة</label><input id="pname" placeholder="مثلاً: شمعة ثلاث طبقات"></div>
+        <div><label>عدد الشمعات بالدفعة</label><input id="batch" type="number" inputmode="numeric" min="1" value="10"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>الطبقات <small id="totalG"></small></h2>
+      <div id="layersEd"></div>
+      <button class="btn btn-ghost" id="addLayer" style="width:100%">+ أضف طبقة</button>
+      <div id="layerWarn"></div>
+    </div>
+
+    <div class="card">
+      <h2>العطور <small>كل طبقة تختار عطرها</small></h2>
+      <div id="frags"></div>
+      <button class="btn btn-ghost" id="addFrag" style="width:100%">+ أضف عطر</button>
+      <p class="hint">العطر يتحسب بالغرام، وكل 1 مل عطر يوزن تقريباً 1 غم.</p>
+    </div>
+
+    <div class="card">
+      <h2>أسعار الشمع والصبغة <small>د.ع</small></h2>
+      <div id="waxPrices" class="grid2"></div>
+      <div class="grid2 mt">
+        <div><label>سعر علبة الصبغة</label><input id="dyePrice" type="number" inputmode="numeric" value="3000"></div>
+        <div><label>وزن علبة الصبغة (غم)</label><input id="dyeQty" type="number" inputmode="decimal" value="20"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>مواد ثانية <small>سعر ÷ كمية × المستخدم</small></h2>
+      <div id="others"></div>
+      <button class="btn btn-ghost" id="addOther" style="width:100%">+ أضف مادة</button>
+    </div>
+
+    <div class="card">
+      <h2>مصاريف إضافية</h2>
+      <div class="grid2">
+        <div><label>أجرة الشغل للشمعة</label><input id="labor" type="number" inputmode="numeric" min="0" value="0"></div>
+        <div><label>غاز/كهرباء للدفعة كلها</label><input id="overhead" type="number" inputmode="numeric" min="0" value="2000"></div>
+        <div><label>توصيل/شحن للشمعة</label><input id="ship" type="number" inputmode="numeric" min="0" value="0"></div>
+        <div><label>نسبة التلف والهدر %</label><input id="waste" type="number" inputmode="decimal" min="0" value="5"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>التسعير</h2>
+      <div class="grid3">
+        <div><label>ربح المفرد على الكلفة %</label><input id="markup" type="number" inputmode="decimal" min="0" value="100"></div>
+        <div><label>ربح الجملة %</label><input id="wmarkup" type="number" inputmode="decimal" min="0" value="50"></div>
+        <div><label>تقريب السعر لأقرب</label>
+          <select id="round"><option value="1">بدون</option><option value="250">250</option><option value="500" selected>500</option><option value="1000">1000</option></select></div>
+      </div>
+      <div class="grid2 mt">
+        <div><label>سعرك الحالي (اختياري)</label><input id="actual" type="number" inputmode="numeric" min="0" placeholder="اكتب سعر البيع"></div>
+        <div style="display:flex;align-items:flex-end"><div id="actualRes" class="hint" style="margin:0 0 10px"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>النتيجة</h2>
+      <div class="breakdown" id="bd"></div>
+      <div class="legend" id="lg"></div>
+      <div class="mt">
+        <div class="res-row"><span>الشمع (كل الطبقات)</span><b id="rWax">0</b></div>
+        <div class="res-row"><span>العطر</span><b id="rFr">0</b></div>
+        <div class="res-row"><span>الصبغة</span><b id="rDye">0</b></div>
+        <div class="res-row"><span>المواد الثانية</span><b id="rOther">0</b></div>
+        <div class="res-row"><span>مصاريف إضافية</span><b id="rExtra">0</b></div>
+        <div class="res-row"><span>الهدر</span><b id="rWaste">0</b></div>
+        <div class="res-row"><span><b>الكلفة الكلية للشمعة</b></span><b id="rCost">0</b></div>
+        <div class="res-row"><span>كلفة الدفعة كاملة</span><b id="rBatch">0</b></div>
+      </div>
+      <div class="grid2">
+        <div class="price-box"><div class="lbl">سعر المفرد المقترح</div><div class="big" id="rRetail">0</div><div class="lbl" id="rRetailP"></div></div>
+        <div class="price-box"><div class="lbl">سعر الجملة المقترح</div><div class="big" id="rWhole">0</div><div class="lbl" id="rWholeP"></div></div>
+      </div>
+      <div class="res-row mt"><span>ربح الدفعة إذا بعتها مفرد</span><b id="rBatchProfit" class="good">0</b></div>
+    </div>
+
+    <div class="card">
+      <h2>منتجاتي المحفوظة</h2>
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn btn-main" id="save">حفظ المنتج</button>
+        <button class="btn btn-ghost" id="newP">منتج جديد</button>
+        <button class="btn btn-ghost" id="copy">نسخ الملخص</button>
+      </div>
+      <div class="saved" id="saved"></div>
+      <p class="hint">المنتجات تنحفظ على هذا الجهاز وهذا المتصفح فقط.</p>
+    </div>
+  </section>
+
+  <!-- ================= GUIDE ================= -->
+  <section class="page" id="p-guide">
+    <div class="card reveal">
+      <h2>اختار نوع الشمع <small>الحرارات تتغير حسب النوع</small></h2>
+      <div class="wax-pick" id="gPick"></div>
+      <div class="temps" id="gTemps"></div>
+      <p class="hint">هذي أرقام تقريبية. كل مورد يكتب حرارات الشمع مالته على الكيس أو الورقة، فالتزم بيها أول.</p>
+    </div>
+
+    <div class="card safety reveal">
+      <h2>⚠️ قبل لا تبدي</h2>
+      <ul>
+        <li>ذوّب الشمع بطريقة الحمّام المائي (قدر داخل قدر بيه ماي) ولا تحطه على النار مباشرة.</li>
+        <li>استخدم محرار دائماً، ولا تترك الشمع على النار وتروح.</li>
+        <li>إذا اشتعل الشمع لا تحط عليه ماي أبد. اطفي النار وغطّي القدر بغطاء.</li>
+        <li>البس كفوف وخلي المكان مهوّى، وخلي الأطفال بعيد.</li>
+      </ul>
+    </div>
+
+    <div id="steps"></div>
+
+    <div class="card reveal">
+      <h2>أنواع الطبقات</h2>
+      <div class="techs">
+        <div class="tech"><div class="mini"><div style="background:#e8a3b5"></div><div style="background:#fff4e0"></div><div style="background:#b49be0"></div></div><b>أفقية</b><span>كل طبقة فوگ الثانية بشكل مستقيم</span></div>
+        <div class="tech slant"><div class="mini"><div style="background:#7fb7c9"></div><div style="background:#fff4e0"></div><div style="background:#f2b880"></div></div><b>مائلة</b><span>تميّل الكأس بزاوية لحد ما تجمد الطبقة</span></div>
+        <div class="tech ombre"><div class="mini"></div><b>متدرجة</b><span>نفس اللون، وتزيد الصبغة بكل طبقة</span></div>
+      </div>
+      <p class="hint">سر الطبقات: صب الطبقة الجاية من تتكوّن على الطبقة اللي قبلها قشرة جامدة بس تبقى دافية من جوّه، وحرارة الصب تكون أعلى شوية من حرارتها. إذا بردت الطبقة كلش، الطبقات راح تنفصل عن بعض.</p>
+    </div>
+  </section>
+
+  <!-- ================= TYPES ================= -->
+  <section class="page" id="p-types">
+    <div id="typesList"></div>
+  </section>
+</div>
+
+<div class="bar" id="bar"><div class="bar-in">
+  <div><div class="k">كلفة الشمعة</div><div class="v" id="bCost">0</div></div>
+  <div style="text-align:left"><div class="k">سعر البيع المقترح</div><div class="v" style="color:var(--accent)" id="bPrice">0</div></div>
+</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const num = v => { const n = parseFloat(String(v).replace(/,/g,'')); return isFinite(n) ? n : 0; };
+const fmt = n => (isFinite(n) ? Math.round(n) : 0).toLocaleString('en-US') + ' د.ع';
+const L = v => /[\u0600-\u06FF]/.test(String(v)) ? v : `<bdi dir="ltr">${v}</bdi>`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- wax data (typical ranges; supplier sheet wins) ---------- */
+const WAX = {
+  soy:{name:'شمع الصويا', short:'صويا', color:'#f3e7cf', melt:'46–52°', add:'80–85°', pour:'55–65°', foMax:10, cure:'1–2 أسبوع', price:9000,
+    desc:'طبيعي من فول الصويا — أشهر نوع للشمع بالكؤوس', scent:3, ease:4, hard:2, cost:3,
+    pros:['طبيعي ونظيف بالاحتراق','يمسك الريحة زين','مناسب جداً للكؤوس'], cons:['ممكن تطلع عليه طبقة بيضة (frosting)','نشر الريحة أضعف من البارافين','يحتاج تعتيق أطول'], use:'كؤوس وجارات', compat:'ينخلط مع البارافين وجوز الهند'},
+  paraffin:{name:'شمع البارافين', short:'بارافين', color:'#fbf8f2', melt:'50–70°', add:'80–85°', pour:'70–80°', foMax:12, cure:'2–4 أيام', price:6000,
+    desc:'مستخرج من النفط — الأرخص والأقوى بنشر الريحة', scent:5, ease:4, hard:4, cost:5,
+    pros:['أقوى نشر للريحة','ألوانه زاهية وسطحه ناعم','أرخص نوع'], cons:['مو طبيعي','دخانه أكثر شوية','بعض الزبائن يفضلون الطبيعي'], use:'كؤوس وقوالب وأعمدة', compat:'ينخلط مع الصويا وشمع العسل'},
+  beeswax:{name:'شمع العسل', short:'عسل', color:'#e9b949', melt:'62–64°', add:'70–75°', pour:'70–75°', foMax:6, cure:'2–3 أيام', price:25000,
+    desc:'من خلايا النحل — فاخر وريحته عسل خفيفة', scent:2, ease:3, hard:5, cost:1,
+    pros:['طبيعي 100٪','يحترق ببطء ويدوم','لونه ذهبي وفخم'], cons:['غالي','العطور ما تبين بيه هواية','يحتاج فتيلة أعرض'], use:'أعمدة وقوالب وشمع فاخر', compat:'ينخلط مع جوز الهند والبارافين'},
+  coconut:{name:'شمع جوز الهند', short:'جوز هند', color:'#fffaf0', melt:'38–45°', add:'80°', pour:'55–60°', foMax:12, cure:'1–2 أسبوع', price:20000,
+    desc:'غالباً يجي خليط ويه الصويا — كريمي وفاخر', scent:5, ease:4, hard:1, cost:2,
+    pros:['ينشر الريحة بشكل ممتاز','سطحه كريمي وناعم','احتراقه بطيء ونظيف'], cons:['غالي','ناعم — يصلح بس للكؤوس','يتأثر بحر الصيف'], use:'كؤوس فاخرة', compat:'ينخلط مع الصويا وشمع العسل'},
+  palm:{name:'شمع النخيل', short:'نخيل', color:'#f0e2c4', melt:'55–60°', add:'85°', pour:'85–90°', foMax:8, cure:'حوالي أسبوع', price:12000,
+    desc:'يطلع نقشة كريستال حلوة على سطح الشمعة', scent:3, ease:3, hard:4, cost:3,
+    pros:['نقشة كريستال/ريش مميزة','صلب ويصلح للأعمدة','طبيعي'], cons:['النقشة تعتمد على حرارة الصب بالضبط','لازم تتأكد إنه مستدام (RSPO)'], use:'أعمدة وشموع صغيرة', compat:'ينخلط مع الصويا'},
+  gel:{name:'شمع الجل', short:'جل', color:'#bfe6f2', melt:'90–105°', add:'85–90°', pour:'85–95°', foMax:5, cure:'ما يحتاج', price:15000,
+    desc:'شفاف — تگدر تحط بداخله ديكور مثل الصدف', scent:2, ease:2, hard:1, cost:3,
+    pros:['شفاف وشكله مميز','حلو للهدايا والديكور'], cons:['يحتاج عطور خاصة تتوافق ويه الجل','ما ينخلط ويه باقي الأنواع','أخطر من غيره — لا تسخنه أكثر من اللازم'], use:'كؤوس زجاج بديكور', compat:'ما ينخلط ويه أي نوع ثاني'}
+};
+const WAX_KEYS = Object.keys(WAX);
+
+/* ---------- state ---------- */
+const DEF = () => ({
+  layers:[
+    {wax:'soy', g:70, color:'#e8a3b5', fo:8, dye:0.15, fr:'f1'},
+    {wax:'soy', g:70, color:'#fff4e0', fo:8, dye:0, fr:'f1'},
+    {wax:'soy', g:60, color:'#b49be0', fo:8, dye:0.15, fr:'f2'},
+  ],
+  prices:Object.fromEntries(WAX_KEYS.map(k=>[k,WAX[k].price])),
+  others:[
+    {name:'فتيلة', price:5000, qty:50, use:1},
+    {name:'كأس / علبة', price:1500, qty:1, use:1},
+    {name:'ستيكر', price:250, qty:1, use:1},
+    {name:'تغليف وكيس', price:500, qty:1, use:1},
+  ],
+  frags:[
+    {id:'f1', name:'فانيلا', price:10000, ml:100},
+    {id:'f2', name:'لافندر', price:12000, ml:100},
+    {id:'f3', name:'ريحان وليمون', price:14000, ml:100},
+  ],
+  shape:'jar', slant:false
+});
+let S = DEF();
+
+/* ---------- tabs ---------- */
+const TABS=['calc','guide','types'];
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+function showTab(t){
+  const i=TABS.indexOf(t);
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  $('pill').style.transform=`translateX(${-i*100}%)`;
+  TABS.forEach(x=>$('p-'+x).classList.toggle('on',x===t));
+  $('bar').classList.toggle('hide',t!=='calc');
+  window.scrollTo({top:0});
+  observeReveals();
+}
+
+/* ---------- candle stage ---------- */
+document.querySelectorAll('[data-shape]').forEach(b=>b.onclick=()=>{
+  S.shape=b.dataset.shape;
+  document.querySelectorAll('[data-shape]').forEach(x=>x.classList.toggle('on',x===b));
+  $('jar').classList.toggle('pillar',S.shape==='pillar');
+});
+$('slantBtn').onclick=()=>{ S.slant=!S.slant; $('slantBtn').classList.toggle('on',S.slant); $('layersVis').classList.toggle('slant',S.slant); };
+$('fireBtn').onclick=()=>{
+  const st=$('stage'); const off=!st.classList.contains('off');
+  st.classList.remove('off'); void st.offsetWidth; if(off) st.classList.add('off');
+  $('fireBtn').textContent = off ? '🔥 إشعال' : '🔥 إطفاء';
+};
+
+function renderVis(){
+  const box=$('layersVis'); const total=S.layers.reduce((s,l)=>s+num(l.g),0)||1;
+  // reuse nodes so heights transition smoothly
+  while(box.children.length>S.layers.length) box.lastChild.remove();
+  S.layers.forEach((l,i)=>{
+    let d=box.children[i];
+    if(!d){ d=document.createElement('div'); d.className='layer'; box.appendChild(d); }
+    d.style.height=(num(l.g)/total*100)+'%';
+    d.style.backgroundColor=l.color;
+    d.classList.toggle('gel',l.wax==='gel');
+  });
+  $('jarLabel').textContent=$('pname').value;
+  $('stageInfo').textContent=`${S.layers.length} طبقة · ${Math.round(total)} غم`;
+}
+
+/* ---------- layers editor ---------- */
+function renderLayers(){
+  const box=$('layersEd'); box.innerHTML='';
+  S.layers.forEach((l,i)=>{
+    const d=document.createElement('div'); d.className='lay';
+    d.innerHTML=`
+      <div class="lay-top">
+        <div class="lay-num" style="background:${l.color}">${i+1}</div>
+        <b>الطبقة ${i===0?'الأولى (الأسفل)':i===S.layers.length-1&&i>0?'الأخيرة (الأعلى)':i+1}</b>
+        <span class="lay-cost" data-cost></span>
+        ${S.layers.length>1?'<button class="x" data-del title="حذف">×</button>':''}
+      </div>
+      <div class="grid3">
+        <div><label>نوع الشمع</label><select data-k="wax">${WAX_KEYS.map(k=>`<option value="${k}" ${k===l.wax?'selected':''}>${WAX[k].short}</option>`).join('')}</select></div>
+        <div><label>الوزن (غم)</label><input data-k="g" type="number" inputmode="decimal" min="0" value="${l.g}"></div>
+        <div><label>اللون</label><input data-k="color" type="color" value="${l.color}"></div>
+        <div><label>نسبة العطر %</label><input data-k="fo" type="number" inputmode="decimal" min="0" value="${l.fo}"></div>
+        <div><label>صبغة (غم)</label><input data-k="dye" type="number" inputmode="decimal" min="0" step="0.05" value="${l.dye}"></div>
+        <div><label>العطر</label><select data-k="fr">${S.frags.map(f=>`<option value="${f.id}" ${f.id===l.fr?'selected':''}>${esc(f.name)}</option>`).join('')}${S.frags.length?'':'<option value="">بدون</option>'}</select></div>
+      </div>
+      <p class="hint" data-fog></p>
+      <div data-w></div>`;
+    d.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('input',()=>{
+      const k=el.dataset.k; l[k]=(k==='wax'||k==='color'||k==='fr')?el.value:num(el.value);
+      if(k==='color') d.querySelector('.lay-num').style.background=el.value;
+      if(k==='wax'){ renderWaxPrices(); }
+      calc();
+    }));
+    const del=d.querySelector('[data-del]'); if(del) del.onclick=()=>{ S.layers.splice(i,1); renderLayers(); renderWaxPrices(); calc(); };
+    box.appendChild(d);
+  });
+}
+const PALETTE=['#e8a3b5','#fff4e0','#b49be0','#7fb7c9','#f2b880','#a8d5a2','#f6d365'];
+$('addLayer').onclick=()=>{
+  const last=S.layers[S.layers.length-1]||{wax:'soy',fo:8};
+  S.layers.push({wax:last.wax,g:50,color:PALETTE[S.layers.length%PALETTE.length],fo:last.fo,dye:0.15,fr:last.fr||(S.frags[0]&&S.frags[0].id)});
+  renderLayers(); renderWaxPrices(); calc();
+};
+
+function renderWaxPrices(){
+  const used=[...new Set(S.layers.map(l=>l.wax))];
+  $('waxPrices').innerHTML=used.map(k=>`<div><label>سعر كيلو ${WAX[k].short}</label><input data-wp="${k}" type="number" inputmode="numeric" value="${S.prices[k]}"></div>`).join('');
+  $('waxPrices').querySelectorAll('[data-wp]').forEach(el=>el.addEventListener('input',()=>{ S.prices[el.dataset.wp]=num(el.value); calc(); }));
+}
+
+const BOTTLE=c=>`<svg viewBox="0 0 22 30"><rect x="8" y="1" width="6" height="5" rx="1" fill="var(--accent)"/><rect x="2" y="6" width="18" height="23" rx="5" fill="${c}" opacity=".85"/><rect x="5" y="11" width="3" height="12" rx="1.5" fill="#fff" opacity=".6"/></svg>`;
+const FR_COL=['#c9b07a','#a48fd1','#8fb06a','#e7a6b8','#7fb7c9','#d9a35b'];
+function fragById(id){ return S.frags.find(f=>f.id===id) || S.frags[0]; }
+function renderFrags(){
+  const box=$('frags'); box.innerHTML='';
+  S.frags.forEach((f,i)=>{
+    const d=document.createElement('div'); d.className='frag';
+    d.innerHTML=`
+      <div class="ic">${BOTTLE(FR_COL[i%FR_COL.length])}</div>
+      <div><label>اسم العطر</label><input data-k="name" value="${esc(f.name)}"></div>
+      <div><label>سعر القنينة</label><input data-k="price" type="number" inputmode="numeric" value="${f.price}"></div>
+      <div><label>الحجم (مل)</label><input data-k="ml" type="number" inputmode="decimal" value="${f.ml}"></div>
+      <div style="display:flex;align-items:end"><button class="x" data-del title="حذف">×</button></div>
+      <div class="stat" data-stat></div>`;
+    d.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('input',()=>{
+      const k=el.dataset.k; f[k]=k==='name'?el.value:num(el.value);
+      if(k==='name') document.querySelectorAll(`#layersEd select[data-k="fr"] option[value="${f.id}"]`).forEach(o=>o.textContent=f.name);
+      calc();
+    }));
+    d.querySelector('[data-del]').onclick=()=>{
+      if(S.frags.length<=1){ toast('لازم يبقى عطر واحد على الأقل'); return; }
+      S.frags.splice(i,1); S.layers.forEach(l=>{ if(l.fr===f.id) l.fr=S.frags[0].id; });
+      renderFrags(); renderLayers(); calc();
+    };
+    box.appendChild(d);
+  });
+}
+$('addFrag').onclick=()=>{ S.frags.push({id:'f'+Date.now().toString(36),name:'عطر جديد',price:10000,ml:100}); renderFrags(); renderLayers(); calc(); };
+
+function renderOthers(){
+  const box=$('others'); box.innerHTML='';
+  S.others.forEach((m,i)=>{
+    const d=document.createElement('div'); d.className='mat';
+    d.innerHTML=`
+      <div class="nm"><label>المادة</label><input data-k="name" value="${esc(m.name)}"></div>
+      <div><label>سعر الشراء</label><input data-k="price" type="number" inputmode="numeric" value="${m.price}"></div>
+      <div><label>عدد/كمية</label><input data-k="qty" type="number" inputmode="decimal" value="${m.qty}"></div>
+      <div><label>بالشمعة</label><input data-k="use" type="number" inputmode="decimal" value="${m.use}"></div>
+      <div style="display:flex;align-items:end;gap:2px"><span class="c" data-c></span><button class="x" data-del>×</button></div>`;
+    d.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('input',()=>{ m[el.dataset.k]=el.dataset.k==='name'?el.value:num(el.value); calc(); }));
+    d.querySelector('[data-del]').onclick=()=>{ S.others.splice(i,1); renderOthers(); calc(); };
+    box.appendChild(d);
+  });
+}
+$('addOther').onclick=()=>{ S.others.push({name:'مادة جديدة',price:0,qty:1,use:1}); renderOthers(); calc(); };
+
+/* ---------- animated numbers ---------- */
+function anim(el,val,f=fmt){
+  const from=num(el.dataset.v||0); el.dataset.v=val;
+  if(Math.abs(from-val)<1){ el.textContent=f(val); return; }
+  const t0=performance.now(), dur=450;
+  cancelAnimationFrame(el._r);
+  const step=t=>{ const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3); el.textContent=f(from+(val-from)*e); if(p<1) el._r=requestAnimationFrame(step); };
+  el._r=requestAnimationFrame(step);
+}
+
+/* ---------- calc ---------- */
+let last={};
+function calc(){
+  const dyePerG=num($('dyePrice').value)/(num($('dyeQty').value)||1);
+  let wax=0, fo=0, frT=0, dyeT=0, warns=[]; const frUse={};
+  const layerEls=$('layersEd').children;
+  S.layers.forEach((l,i)=>{
+    const w=num(l.g)*num(S.prices[l.wax])/1000;
+    const foG=num(l.g)*num(l.fo)/100;
+    const F=fragById(l.fr); const frC=F? foG*num(F.price)/(num(F.ml)||1) : 0;
+    const dyC=num(l.dye)*dyePerG; const f=frC+dyC;
+    wax+=w; fo+=f; frT+=frC; dyeT+=dyC;
+    if(F){ frUse[F.id]=frUse[F.id]||{g:0,c:0}; frUse[F.id].g+=foG; frUse[F.id].c+=frC; }
+    const el=layerEls[i]; if(el){
+      el.querySelector('[data-cost]').textContent=fmt(w+f);
+      el.querySelector('[data-fog]').innerHTML=`شمع ${fmt(w)} · عطر ${F?esc(F.name):''} <bdi dir="ltr">${Math.round(foG*10)/10}</bdi> غم = ${fmt(frC)} · صبغة ${fmt(dyC)}`;
+      const W=WAX[l.wax], box=el.querySelector('[data-w]');
+      const msg = num(l.fo)>W.foMax ? `نسبة العطر عالية على ${W.short} — الحد الأعلى تقريباً ${W.foMax}٪، وإذا زادت العطر يرشح من الشمعة.` : '';
+      if(box.dataset.m!==msg){ box.dataset.m=msg; box.innerHTML=msg?`<div class="warn">${msg}</div>`:''; }
+    }
+  });
+  const fEls=$('frags').children;
+  S.frags.forEach((f,i)=>{ const u=frUse[f.id], perMl=num(f.price)/(num(f.ml)||1), el=fEls[i]; if(!el) return;
+    const bottles = u&&u.g ? Math.floor(num(f.ml)/u.g) : 0;
+    el.querySelector('[data-stat]').innerHTML = `المل بـ <b>${fmt(perMl)}</b>` + (u&&u.g ? ` · بهاي الشمعة <b><bdi dir="ltr">${Math.round(u.g*10)/10}</bdi> غم = ${fmt(u.c)}</b> · القنينة تكفي ${bottles} شمعة` : ' · ما مستخدم بهاي الشمعة'); });
+  const types=new Set(S.layers.map(l=>l.wax));
+  if(types.has('gel') && types.size>1) warns.push('شمع الجل ما ينخلط ويه باقي الأنواع ولا يلزق بيها، فالأحسن تسوي الطبقات كلها جل.');
+  $('layerWarn').innerHTML=warns.map(w=>`<div class="warn">${w}</div>`).join('');
+  $('totalG').textContent=Math.round(S.layers.reduce((s,l)=>s+num(l.g),0))+' غم شمع';
+
+  let other=0; const oEls=$('others').children;
+  S.others.forEach((m,i)=>{ const c=num(m.qty)?num(m.price)/num(m.qty)*num(m.use):0; other+=c; if(oEls[i]) oEls[i].querySelector('[data-c]').textContent=fmt(c); });
+
+  const batch=Math.max(1,num($('batch').value));
+  const extra=num($('labor').value)+num($('overhead').value)/batch+num($('ship').value);
+  const wasteAmt=(wax+fo+other+extra)*num($('waste').value)/100;
+  const cost=wax+fo+other+extra+wasteAmt;
+  const r=Math.max(1,num($('round').value)); const up=v=>Math.ceil(v/r)*r;
+  const retail=up(cost*(1+num($('markup').value)/100));
+  const whole=up(cost*(1+num($('wmarkup').value)/100));
+
+  anim($('rWax'),wax); anim($('rFr'),frT); anim($('rDye'),dyeT); anim($('rOther'),other); anim($('rExtra'),extra); anim($('rWaste'),wasteAmt);
+  anim($('rCost'),cost); anim($('rBatch'),cost*batch); anim($('rRetail'),retail); anim($('rWhole'),whole);
+  $('rRetailP').textContent='ربحك '+fmt(retail-cost); $('rWholeP').textContent='ربحك '+fmt(whole-cost);
+  anim($('rBatchProfit'),(retail-cost)*batch); anim($('bCost'),cost); anim($('bPrice'),retail);
+
+  const a=num($('actual').value);
+  if(a>0){ const p=a-cost, pct=cost?p/cost*100:0;
+    $('actualRes').innerHTML=`<span class="${p>=0?'good':'bad'}"><b>${p>=0?'ربح':'خسارة'} ${fmt(Math.abs(p))}</b> بالشمعة (${Math.round(pct)}٪ على الكلفة)</span>`;
+  } else $('actualRes').textContent='';
+
+  const parts=[{n:'شمع',v:wax,c:'#d9c27a'},{n:'عطر',v:frT,c:'#a96fb5'},{n:'صبغة',v:dyeT,c:'#e7a6b8'},{n:'مواد ثانية',v:other,c:'#5b8fb9'},{n:'مصاريف',v:extra,c:'#6b7b3a'},{n:'هدر',v:wasteAmt,c:'#b9aca0'}].filter(p=>p.v>0);
+  const tot=parts.reduce((s,p)=>s+p.v,0)||1;
+  const bd=$('bd'); if(bd.children.length!==parts.length) bd.innerHTML=parts.map(()=>'<div style="width:0"></div>').join('');
+  requestAnimationFrame(()=>parts.forEach((p,i)=>{ bd.children[i].style.width=(p.v/tot*100)+'%'; bd.children[i].style.background=p.c; bd.children[i].title=p.n; }));
+  $('lg').innerHTML=parts.map(p=>`<span><i style="background:${p.c}"></i>${p.n} ${Math.round(p.v/tot*100)}٪</span>`).join('');
+
+  renderVis();
+  last={name:$('pname').value||'شمعة',cost,retail,whole,wax,fo,frT,dyeT,other,extra,wasteAmt};
+}
+
+/* ---------- storage ---------- */
+const KEY='candle-studio-products';
+const FIELDS=['pname','batch','dyePrice','dyeQty','labor','overhead','ship','waste','markup','wmarkup','round','actual'];
+function loadAll(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } }
+function saveAll(l){ try{ localStorage.setItem(KEY,JSON.stringify(l)); return true; }catch(e){ return false; } }
+function snapshot(){ const o={S:JSON.parse(JSON.stringify(S))}; FIELDS.forEach(f=>o[f]=$(f).value); o.cost=last.cost; o.retail=last.retail; return o; }
+function restore(o){ FIELDS.forEach(f=>{ if(o[f]!==undefined) $(f).value=o[f]; }); S=Object.assign(DEF(),o.S||{}); S.layers.forEach(l=>{ if(!S.frags.some(f=>f.id===l.fr)) l.fr=S.frags[0].id; }); $('layersVis').innerHTML=''; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+function renderSaved(){
+  const l=loadAll(), box=$('saved');
+  if(!l.length){ box.innerHTML='<p class="hint" style="margin:0">ما عندك منتجات محفوظة بعد.</p>'; return; }
+  box.innerHTML='';
+  l.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='saved-item';
+    const sw=(p.S&&p.S.layers||[]).map(x=>`<i style="display:inline-block;width:8px;height:16px;background:${x.color};border-radius:2px"></i>`).join('');
+    d.innerHTML=`<div style="display:flex;gap:1px">${sw}</div><span>${esc(p.pname||'شمعة')}</span><em>كلفة ${fmt(p.cost)} · بيع ${fmt(p.retail)}</em><button class="x">×</button>`;
+    d.querySelector('span').onclick=()=>{ restore(p); toast('تم فتح المنتج'); };
+    d.querySelector('.x').onclick=()=>{ const a=loadAll(); a.splice(i,1); saveAll(a); renderSaved(); };
+    box.appendChild(d);
+  });
+}
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),1600); }
+$('save').onclick=()=>{ const s=snapshot(); if(!s.pname) s.pname='شمعة'; const l=loadAll(); const i=l.findIndex(p=>p.pname===s.pname); if(i>=0) l[i]=s; else l.push(s); toast(saveAll(l)?'تم الحفظ ✓':'ما گدرت أحفظ بهذا المتصفح'); renderSaved(); };
+$('newP').onclick=()=>{ $('pname').value=''; $('actual').value=''; S=DEF(); $('layersVis').innerHTML=''; renderAll(); toast('منتج جديد'); };
+$('copy').onclick=async()=>{
+  const lines=[`🌿 الريحانة للشمع — ${last.name}`, ...S.layers.map((l,i)=>`طبقة ${i+1}: ${WAX[l.wax].short} ${l.g} غم، ${(fragById(l.fr)||{}).name||'عطر'} ${l.fo}٪`),
+    `الشمع: ${fmt(last.wax)}`,`العطر: ${fmt(last.frT)}`,`الصبغة: ${fmt(last.dyeT)}`,`مواد ثانية: ${fmt(last.other)}`,`مصاريف وهدر: ${fmt(last.extra+last.wasteAmt)}`,
+    `الكلفة الكلية: ${fmt(last.cost)}`,`سعر المفرد: ${fmt(last.retail)}`,`سعر الجملة: ${fmt(last.whole)}`];
+  try{ if(window.Android&&Android.copy){ Android.copy(lines.join('\n')); } else { await navigator.clipboard.writeText(lines.join('\n')); } toast('تم النسخ ✓'); }catch(e){ toast('النسخ غير متاح هنا'); }
+};
+FIELDS.forEach(f=>$(f).addEventListener('input',calc));
+
+/* ---------- guide ---------- */
+let gWax='soy';
+const STEPS = W => [
+  {ill:'<div class="sc-base"></div><div class="sc-plate"></div><div class="sc-flakes"></div>', t:'حضّر وقيس',
+   p:`نظّف الكأس وجففه زين. وزّن الشمع بالميزان: الكأس اللي يشيل 200 مل ماي يحتاج تقريباً 180 غم شمع.`, tip:'الحاسبة تحسبلك وزن كل طبقة وكلفتها.'},
+  {ill:'<div class="thermo"></div><div class="pot"></div><div class="pot-in"><div class="bub" style="left:6px"></div><div class="bub" style="left:20px;animation-delay:.6s"></div><div class="bub" style="left:32px;animation-delay:1.1s"></div></div><div class="fire" style="left:30px"></div><div class="fire" style="left:44px;animation-delay:.2s"></div><div class="fire" style="left:58px;animation-delay:.4s"></div>', t:'ذوّب الشمع',
+   p:`ذوّب ${W.name} بالحمّام المائي على نار هادئة. يبدي يذوب على حرارة <b>${L(W.melt)}</b>، وكمّل تسخين لحد حرارة إضافة العطر.`, tip:'حرّك بين فترة وفترة وراقب المحرار.'},
+  {ill:'<div class="bowl"></div><div class="spoon"></div><div class="bottle"></div><div class="drop"></div>', t:'ضيف الصبغة والعطر',
+   p:`ضيف الصبغة أول لحد ما تذوب كلها. بعدها نزّل القدر من النار، ومن توصل الحرارة <b>${L(W.add)}</b> ضيف العطر وحرّك بهدوء دقيقتين. لا تزيد العطر على <b>${W.foMax}٪</b> من وزن الشمع.`, tip:'إذا ضفت العطر والشمع حار هواية تطير ريحته، وإذا كان بارد ما يختلط زين.'},
+  {ill:'<div class="wjar"></div><div class="wk"></div><div class="clip"></div>', t:'ثبّت الفتيلة',
+   p:'لزّگ الفتيلة بنص قاعدة الكأس بستيكر الفتايل أو قطرة غراء حار، وثبّتها من فوگ بماسكة أو عودين.', tip:`نوع الفتيلة وحجمها يعتمد على عرض الكأس. ${W.short==='عسل'?'شمع العسل يحتاج فتيلة أعرض من العادي.':'اقرا جدول الفتايل اللي يعطيك ياه المورد.'}`},
+  {ill:'<div class="pitcher"></div><div class="stream"></div><div class="pjar"><div class="pfill"></div></div>', t:'صب الشمع',
+   p:`صب ببطء على حرارة <b>${L(W.pour)}</b>، وخلي ما بين 1 و1.5 سم فاضي من فوگ.`, tip:'إذا صبيت بسرعة تطلع فقاعات هوا. دفّي الكأس شوية قبل الصب حتى يلزق الشمع على الجوانب.'},
+  {ill:'<div class="ljar"><div></div><div></div><div></div></div>', t:'سوّي الطبقات',
+   p:'من تتكوّن قشرة على الطبقة الأولى وتبقى دافية من جوّه (عادة بعد 20 إلى 40 دقيقة)، صب الطبقة الثانية بلون ثاني وعلى حرارة أعلى بشوية. ونفس الشي لباقي الطبقات.', tip:'للطبقات المائلة: ميّل الكأس بزاوية بكرتونة أو صينية مخصصة لحد ما تجمد كل طبقة.'},
+  {ill:'<div class="cjar"><div class="cfill"></div></div><div class="snow" style="left:14px">❄</div><div class="snow" style="right:14px;animation-delay:1s">❄</div>', t:'التبريد',
+   p:'خلي الشمعة تبرد على كيفها بحرارة الغرفة لمدة 24 ساعة. لا تحطها بالثلاجة ولا گدام المبردة.', tip:'إذا طلعت حفرة بالسطح، سخّنه بالسشوار الحراري أو صب طبقة رقيقة فوگه.'},
+  {ill:'<div class="cal"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>', t:'التعتيق (الكيور)',
+   p:`سد الكأس بغطائه وخليه بمكان بارد ومظلم لمدة <b>${L(W.cure)}</b>. خلال هالمدة العطر يندمج ويه الشمع والريحة تصير أقوى.`, tip:'الفتيلة گصها بعد التعتيق بحيث يبقى منها 5 ملم تقريباً.'},
+  {ill:'<div class="bjar"></div><div class="pool"></div><div class="bfl"></div>', t:'اختبر قبل البيع',
+   p:'أول مرة تشعلها خليها تشتغل لحد ما يذوب السطح كله ويوصل للحواف، وهذا ياخذ حوالي ساعة لكل 2.5 سم من عرض الكأس. راقب اللهب: لازم يكون ثابت وطوله أقل من 2.5 سم.', tip:'إذا يطلع دخان أسود، الفتيلة كبيرة. وإذا الشمع يذوب بس بالنص وتصير حفرة، الفتيلة صغيرة.'},
+];
+function renderGuide(){
+  $('gPick').innerHTML=WAX_KEYS.map(k=>`<button data-gw="${k}" class="${k===gWax?'on':''}"><i style="background:${WAX[k].color}"></i>${WAX[k].short}</button>`).join('');
+  $('gPick').querySelectorAll('button').forEach(b=>b.onclick=()=>{ gWax=b.dataset.gw; renderGuide(); });
+  const W=WAX[gWax];
+  $('gTemps').innerHTML=[['يذوب',W.melt],['إضافة العطر',W.add],['الصب',W.pour],['أعلى عطر',W.foMax+'٪']].map(([a,b])=>`<div class="temp"><b>${L(b)}</b><span>${a}</span></div>`).join('');
+  $('steps').innerHTML=STEPS(W).map((s,i)=>`<div class="card reveal"><div class="step"><div class="ill">${s.ill}</div><div><h3><em>${i+1}</em>${s.t}</h3><p>${s.p}</p><div class="tip">💡 ${s.tip}</div></div></div></div>`).join('');
+  observeReveals();
+}
+
+/* ---------- types ---------- */
+function renderTypes(){
+  const m=(l,v)=>`<div class="meter"><span>${l}</span><div class="track"><div class="fill" style="--w:${v*20}%"></div></div></div>`;
+  $('typesList').innerHTML=WAX_KEYS.map(k=>{ const W=WAX[k]; return `
+    <div class="card wax-card reveal">
+      <div class="wax-head"><div class="wax-blob" style="background:${W.color}"></div><div><h3>${W.name}</h3><p>${W.desc}</p></div></div>
+      <div class="props">
+        <div class="prop"><b>${L(W.melt)}</b><span>يذوب</span></div>
+        <div class="prop"><b>${L(W.pour)}</b><span>الصب</span></div>
+        <div class="prop"><b>${W.foMax}٪</b><span>أعلى عطر</span></div>
+        <div class="prop"><b>${L(W.cure)}</b><span>التعتيق</span></div>
+      </div>
+      ${m('نشر الريحة',W.scent)}${m('سهولة الشغل',W.ease)}${m('الصلابة',W.hard)}${m('رخص السعر',W.cost)}
+      <div class="pc"><div class="p"><h4>✓ مميزاته</h4><ul>${W.pros.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="c"><h4>✗ عيوبه</h4><ul>${W.cons.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+      <p class="hint"><b>يناسب:</b> ${W.use} · <b>الخلط:</b> ${W.compat}</p>
+      <div class="btn-row mt"><button class="btn btn-ghost" data-howto="${k}">طريقة الصنع بـ${W.short}</button><button class="btn btn-ghost" data-uselayer="${k}">ضيفه كطبقة</button></div>
+    </div>`; }).join('')
+    + `<p class="hint" style="text-align:center">الأرقام تقريبية وتختلف من مورد لمورد، والأسعار الافتراضية بالحاسبة مجرد مثال.</p>`;
+  $('typesList').querySelectorAll('[data-howto]').forEach(b=>b.onclick=()=>{ gWax=b.dataset.howto; renderGuide(); showTab('guide'); });
+  $('typesList').querySelectorAll('[data-uselayer]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.uselayer; S.layers.push({wax:k,g:50,color:WAX[k].color,fo:Math.min(8,WAX[k].foMax),dye:0,fr:S.frags[0]&&S.frags[0].id});
+    renderLayers(); renderWaxPrices(); calc(); showTab('calc'); setTimeout(()=>$('layersEd').scrollIntoView({behavior:'smooth',block:'center'}),300); toast('انضافت طبقة '+WAX[k].short);
+  });
+}
+
+/* ---------- scroll reveal ---------- */
+let io;
+function observeReveals(){
+  if(!('IntersectionObserver' in window)){ document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in')); return; }
+  io = io || new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.12});
+  document.querySelectorAll('.page.on .reveal:not(.in)').forEach(e=>io.observe(e));
+}
+
+function renderAll(){
+  renderFrags(); renderLayers(); renderWaxPrices(); renderOthers(); calc();
+  document.querySelectorAll('[data-shape]').forEach(x=>x.classList.toggle('on',x.dataset.shape===S.shape));
+  $('jar').classList.toggle('pillar',S.shape==='pillar');
+  $('slantBtn').classList.toggle('on',!!S.slant); $('layersVis').classList.toggle('slant',!!S.slant);
+}
+$('pname').addEventListener('input',renderVis);
+renderAll(); renderSaved(); renderGuide(); renderTypes();
+
+/* ---------- splash ---------- */
+(function(){
+  const name='الريحانة للشمع', box=$('spName');
+  // animate by word so Arabic letters stay joined
+  name.split(' ').forEach((w,i)=>{ const sp=document.createElement('span'); sp.textContent=w+(i?'':'\u00a0'); sp.style.animationDelay=(1.9+i*.25)+'s'; box.appendChild(sp); });
+  const sp=$('splash'); let gone=false;
+  const hide=()=>{ if(gone) return; gone=true; sp.classList.add('done'); setTimeout(()=>sp.remove(),800); observeReveals(); };
+  const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setTimeout(hide, reduce?300:3600);
+  sp.addEventListener('click',hide);
+})();
+</script>
+<script>
+// Android back button: go back to the calculator tab before closing the app
+window.appBack=function(){ const on=document.querySelector('#tabs button.on'); if(on && on.dataset.t!=='calc'){ showTab('calc'); return true; } return false; };
+</script>
+</body>
+</html>
